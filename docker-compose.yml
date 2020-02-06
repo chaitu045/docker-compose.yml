@@ -1,0 +1,143 @@
+version: '2.1'
+
+services:
+  nginx:
+    image: nginx
+    ports:
+      - 80:80
+    restart: always
+    volumes:
+      - ./nginx/default:/etc/nginx/conf.d/default.conf
+      - ./uss-ui/:/home/uss-ui
+      - ./anglr2/:/home/anglr2
+
+  dynamodb:
+    image: cnadiminti/dynamodb-local
+    ports:
+      - 8000:8000
+    restart: always
+    volumes:
+      - ./docker-images/dockervol/dynamodb:/dynamodb_local_db
+
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: vsspl123
+      POSTGRES_DB: vsspl
+    ports:
+      - 5342:5342
+    restart: always
+    volumes:
+      - ./docker-images/dockervol/postgres:/var/lib/postgresql/data
+
+  freegeoips:
+    image: fiorix/freegeoip
+    ports:
+      - 8081:8080
+    restart: always
+    
+  backendjar:
+    image: backendjar
+    restart: always
+    volumes:
+      - ./docker-images/dockervol/backend-jar/:/home
+
+  gremlin-server:
+    image: dnaga/gremlin-neo4j:modified
+    ports:
+      - 8182:8182  
+    restart: always  
+    volumes:
+      - ./docker-images/dockervol/gremlin-server/data/:/gremlin/apache-tinkerpop-gremlin-server-3.3.3/data
+      - ./docker-images/dockervol/gremlin-server/conf/:/gremlin/apache-tinkerpop-gremlin-server-3.3.3/conf
+      - ./docker-images/dockervol/gremlin-server/bin/:/gremlin/apache-tinkerpop-gremlin-server-3.3.3/bin
+
+  minio-s3: 
+#    environment: 
+#      - MINIO_ACCESS_KEY=AKIAJPKIEGQPZLTARDXQ
+#      - MINIO_SECRET_KEY=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
+    image: minio/minio
+    environment:
+      - MINIO_ACCESS_KEY=AKIAJPKIEGQPZLTARDXQ
+      - MINIO_SECRET_KEY=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
+    ports: 
+      - "8001:9000"
+    restart: always
+    volumes: 
+      - "./docker-images/dockervol/S3/data:/data"
+      - "./docker-images/dockervol/S3/config:/root/.minio"
+    command: server /data
+
+  uss-jetty:
+#    environment:
+#      - JAVA_OPTIONS="-Xmx256m"
+#    environment:
+#      - JAVA_OPTIONS="-Xmx512m -Xms512m -XX:MaxPermSize=1024m"
+    image: jetty
+    environment:
+      JAVA_OPTIONS: "-Xmx512m -Xms128m"
+    mem_limit: 1000m
+    mem_reservation: 512m
+    ports:
+      - "8080:8080"
+    restart: always
+    volumes:
+      - ./docker-images/dockervol/uss-jetty/kalgudi-uss/:/var/lib/jetty/webapps/kalgudi-uss
+
+  slave-jetty:
+#    environment:
+#      - JAVA_OPTIONS="-Xmx512m"
+    image: jetty
+    environment:
+      JAVA_OPTIONS: "-Xmx512m -Xms128m"
+    mem_limit: 1000m
+    mem_reservation: 512m
+    restart: always
+    volumes:
+      - ./docker-images/dockervol/slave-jetty/:/var/lib/jetty/webapps
+
+  search-jetty:
+#    environment:
+#      - JAVA_OPTIONS="-Xmx512m"
+#    environment:
+#      - JAVA_OPTS="-Xmx512m -Xms512m -XX:MaxPermSize=1024m"
+    image: jetty
+    environment:
+      JAVA_OPTIONS: "-Xmx512m -Xms128m"
+    mem_limit: 1000m
+    mem_reservation: 512m
+    restart: always
+    volumes:
+      - ./docker-images/dockervol/search-jetty/:/var/lib/jetty/webapps
+
+  elastic_search:
+    image: myelastic624/myelastic624
+    mem_limit: 1000m
+    mem_reservation: 512m
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    restart: always
+    volumes:
+      - ./docker-images/dockervol/elasticsearch/data/:/usr/share/elasticsearch/data
+      - ./docker-images/dockervol/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+
+  verdaccio:
+    image: verdaccio/verdaccio
+    ports:
+      - "4873:4873"
+    restart: always
+    volumes:
+      - ./verdaccio/conf:/verdaccio/conf
+      - ./verdaccio/plugins:/verdaccio/plugins
+      - ./verdaccio/storage:/verdaccio/storage
+
+  jenkins:
+    image: jenkins/jenkins
+    ports:
+      - "5000:8080"
+    restart: always
+    volumes:
+      - /home/udaybhaskar/Downloads/chaitu/jenkins:/var/jenkins_home
+      
+      
