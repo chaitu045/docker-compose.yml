@@ -3,6 +3,7 @@ version: '2.1'
 services:
   nginx:
     image: nginx
+    container_name: nginx
     ports:
       - 80:80
     restart: always
@@ -13,14 +14,16 @@ services:
 
   dynamodb:
     image: cnadiminti/dynamodb-local
+    container_name: dynamodb
     ports:
       - 8000:8000
     restart: always
     volumes:
-      - ./docker-images/dockervol/dynamodb:/dynamodb_local_db
+      - ./dynamodb:/dynamodb_local_db
 
   postgres:
     image: postgres
+    container_name: postgres
     environment:
       POSTGRES_PASSWORD: vsspl123
       POSTGRES_DB: vsspl
@@ -28,44 +31,50 @@ services:
       - 5342:5342
     restart: always
     volumes:
-      - ./docker-images/dockervol/postgres:/var/lib/postgresql/data
+      - ./postgres:/var/lib/postgresql/data
 
   freegeoips:
     image: fiorix/freegeoip
+    container_name: freegeoip
     ports:
       - 8081:8080
     restart: always
+    volumes:
+      - /home/udaybhaskar/dockervol/tmp/freegeoip/db.gz:/tmp/freegeoip/db.gz
     
   backendjar:
     image: backendjar
+    container_name: backendjar
     restart: always
     volumes:
-      - ./docker-images/dockervol/backend-jar/:/home
+      - ./backend-jar/:/home
 
   gremlin-server:
     image: dnaga/gremlin-neo4j:modified
+    container_name: gremlin
     ports:
       - 8182:8182  
     restart: always  
     volumes:
-      - ./docker-images/dockervol/gremlin-server/data/:/gremlin/apache-tinkerpop-gremlin-server-3.3.3/data
-      - ./docker-images/dockervol/gremlin-server/conf/:/gremlin/apache-tinkerpop-gremlin-server-3.3.3/conf
-      - ./docker-images/dockervol/gremlin-server/bin/:/gremlin/apache-tinkerpop-gremlin-server-3.3.3/bin
+      - ./gremlin-server/data/:/gremlin/apache-tinkerpop-gremlin-server-3.3.3/data
+      - ./gremlin-server/conf/:/gremlin/apache-tinkerpop-gremlin-server-3.3.3/conf
+      - ./gremlin-server/bin/:/gremlin/apache-tinkerpop-gremlin-server-3.3.3/bin
 
   minio-s3: 
 #    environment: 
-#      - MINIO_ACCESS_KEY=#
-#      - MINIO_SECRET_KEY=BGilRPHwvGAgaWnyUTX7
+#      - MINIO_ACCESS_KEY=
+#      - MINIO_SECRET_KEY=
     image: minio/minio
+    container_name: s3
     environment:
-      - MINIO_ACCESS_KEY= add
-      - MINIO_SECRET_KEY= add
+      - MINIO_ACCESS_KEY=ADD
+      - MINIO_SECRET_KEY=ADD
     ports: 
       - "8001:9000"
     restart: always
     volumes: 
-      - "./docker-images/dockervol/S3/data:/data"
-      - "./docker-images/dockervol/S3/config:/root/.minio"
+      - "./S3/data:/data"
+      - "./S3/config:/root/.minio"
     command: server /data
 
   uss-jetty:
@@ -74,6 +83,7 @@ services:
 #    environment:
 #      - JAVA_OPTIONS="-Xmx512m -Xms512m -XX:MaxPermSize=1024m"
     image: jetty
+    container_name: uss-jetty
     environment:
       JAVA_OPTIONS: "-Xmx512m -Xms128m"
     mem_limit: 1000m
@@ -82,19 +92,20 @@ services:
       - "8080:8080"
     restart: always
     volumes:
-      - ./docker-images/dockervol/uss-jetty/kalgudi-uss/:/var/lib/jetty/webapps/kalgudi-uss
+      - ./uss-jetty/kalgudi-uss/:/var/lib/jetty/webapps/kalgudi-uss
 
   slave-jetty:
 #    environment:
 #      - JAVA_OPTIONS="-Xmx512m"
     image: jetty
+    container_name: slave-jetty
     environment:
       JAVA_OPTIONS: "-Xmx512m -Xms128m"
     mem_limit: 1000m
     mem_reservation: 512m
     restart: always
     volumes:
-      - ./docker-images/dockervol/slave-jetty/:/var/lib/jetty/webapps
+      - ./slave-jetty/:/var/lib/jetty/webapps
 
   search-jetty:
 #    environment:
@@ -102,28 +113,31 @@ services:
 #    environment:
 #      - JAVA_OPTS="-Xmx512m -Xms512m -XX:MaxPermSize=1024m"
     image: jetty
+    container_name: search-jetty
     environment:
       JAVA_OPTIONS: "-Xmx512m -Xms128m"
     mem_limit: 1000m
     mem_reservation: 512m
     restart: always
     volumes:
-      - ./docker-images/dockervol/search-jetty/:/var/lib/jetty/webapps
+      - ./search-jetty/:/var/lib/jetty/webapps
 
   elastic_search:
     image: myelastic624/myelastic624
-    mem_limit: 1000m
+    container_name: elastic_search
+    mem_limit: 512m
     mem_reservation: 512m
     ports:
       - "9200:9200"
       - "9300:9300"
     restart: always
     volumes:
-      - ./docker-images/dockervol/elasticsearch/data/:/usr/share/elasticsearch/data
-      - ./docker-images/dockervol/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elasticsearch/data/:/usr/share/elasticsearch/data
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
 
   verdaccio:
     image: verdaccio/verdaccio
+    container_name: verdaccio
     ports:
       - "4873:4873"
     restart: always
@@ -134,10 +148,9 @@ services:
 
   jenkins:
     image: jenkins/jenkins
+    container_name: jenkins
     ports:
       - "5000:8080"
     restart: always
     volumes:
-      - /home/udaybhaskar/Downloads/chaitu/jenkins:/var/jenkins_home
-      
-      
+      - ./jenkins:/var/jenkins_home
