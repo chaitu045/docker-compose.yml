@@ -54,12 +54,12 @@ services:
 
   minio-s3: 
 #    environment: 
-#      - MINIO_ACCESS_KEY=AKIAJPKIEGQPZLTARDXQ
-#      - MINIO_SECRET_KEY=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
+#      - MINIO_ACCESS_KEY=#
+#      - MINIO_SECRET_KEY=BGilRPHwvGAgaWnyUTX7
     image: minio/minio
     environment:
-      - MINIO_ACCESS_KEY=AKIAJPKIEGQPZLTARDXQ
-      - MINIO_SECRET_KEY=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
+      - MINIO_ACCESS_KEY= add
+      - MINIO_SECRET_KEY= add
     ports: 
       - "8001:9000"
     restart: always
