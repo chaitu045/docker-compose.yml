@@ -146,6 +146,7 @@ services:
       - ./verdaccio/plugins:/verdaccio/plugins
       - ./verdaccio/storage:/verdaccio/storage
 
+# Jenkins file
   jenkins:
     image: jenkins/jenkins
     container_name: jenkins
