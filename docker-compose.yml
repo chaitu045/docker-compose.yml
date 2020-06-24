@@ -146,11 +146,11 @@ services:
       - ./verdaccio/plugins:/verdaccio/plugins
       - ./verdaccio/storage:/verdaccio/storage
 
-  jenkins:
-    image: jenkins/jenkins
-    container_name: jenkins
-    ports:
-      - "5000:8080"
-    restart: always
-    volumes:
-      - ./jenkins:/var/jenkins_home
+#  jenkins:
+#    image: jenkins/jenkins
+#    container_name: jenkins
+#    ports:
+#      - "5000:8080"
+#    restart: always
+#    volumes:
+#      - ./jenkins:/var/jenkins_home
